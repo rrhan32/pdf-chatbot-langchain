@@ -1,9 +1,10 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { PineconeStore } from 'langchain/vectorstores/pinecone';
+import { CohereEmbeddings } from "@langchain/cohere";
+import { PineconeStore } from "@langchain/pinecone";
 import { pinecone } from '@/utils/pinecone-client';
-import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
+import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { PINECONE_INDEX_NAME, PINECONE_NAME_SPACE } from '@/config/pinecone';
+import { COHERE_API_KEY } from '@/config/pinecone';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 
 /* Name of directory to retrieve your files from 
@@ -32,7 +33,12 @@ export const run = async () => {
 
     console.log('creating vector store...');
     /*create and store the embeddings in the vectorStore*/
-    const embeddings = new OpenAIEmbeddings();
+    const embeddings = new CohereEmbeddings({
+       model: "embed-english-v3.0",
+       apiKey: COHERE_API_KEY,  // In Node.js defaults to process.env.COHERE_API_KEY
+       batchSize: 48, // Default value if omitted is 48. Max value is 96
+     });
+     console.log(' vector store created successfully...');
     const index = pinecone.Index(PINECONE_INDEX_NAME); //change to your own index name
 
     //embed the PDF documents
