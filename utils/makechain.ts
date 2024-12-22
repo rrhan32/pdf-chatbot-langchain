@@ -1,7 +1,8 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { ChatPromptTemplate } from 'langchain/prompts';
-import { RunnableSequence } from 'langchain/schema/runnable';
-import { StringOutputParser } from 'langchain/schema/output_parser';
+import { ChatCohere } from "@langchain/cohere";
+import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { RunnableSequence } from '@langchain/core/runnables';
+import { StringOutputParser } from '@langchain/core/output_parsers';
 import type { Document } from 'langchain/document';
 import type { VectorStoreRetriever } from 'langchain/vectorstores/base';
 
@@ -40,10 +41,9 @@ export const makeChain = (retriever: VectorStoreRetriever) => {
     ChatPromptTemplate.fromTemplate(CONDENSE_TEMPLATE);
   const answerPrompt = ChatPromptTemplate.fromTemplate(QA_TEMPLATE);
 
-  const model = new ChatOpenAI({
-    temperature: 0, // increase temperature to get more creative answers
-    modelName: 'gpt-3.5-turbo', //change this to gpt-4 if you have access
-  });
+  const model = new ChatCohere({
+    apiKey: process.env.COHERE_API_KEY,
+});
 
   // Rephrase the initial question into a dereferenced standalone question based on
   // the chat history to allow effective vectorstore querying.
